@@ -1,6 +1,7 @@
 /* LoginForm.css */
 
 .wrapper {
+  font-family: var(--cc-font-family);
   min-height: 100dvh;
   display: grid;
   place-items: center;
