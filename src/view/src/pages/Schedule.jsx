@@ -1,7 +1,12 @@
+import Header from "../components/Header/Header.jsx";
+
 function Schedule() {
     return (
         <div>
-            <h1>Schedule Page</h1>
+        <Header />
+            <div>
+                <h1>Schedule Page</h1>
+            </div>
         </div>
     )
 

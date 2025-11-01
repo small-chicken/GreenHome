@@ -1,8 +1,14 @@
+import { Link } from "react-router-dom";
+
 function Header () {
     return (
-        <div>
-            <h1>Header Component</h1>
-        </div>
+        <nav className = "header">
+            <div className = "navbar-links">
+                <Link to="/">Logout</Link>
+                <Link to="/preferences">Preferences</Link>
+                <Link to="/schedule">Schedule</Link>
+            </div>
+        </nav>
     )
 }
 
