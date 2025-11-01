@@ -1,0 +1,75 @@
+/* Container (optional styling) */
+.preference-setter {
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--cc-font-family);
+}
+
+/* Dropdown wrapper */
+.pref-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Trigger button */
+.pref-dropdown__trigger {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.pref-dropdown__trigger:hover {
+  background: color-mix(in oklab, var(--primary) 8%, var(--surface));
+  border-color: var(--primary);
+}
+.pref-dropdown__trigger:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+/* The dropdown menu */
+.pref-dropdown__menu {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  min-width: 220px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.4rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,.12);
+  z-index: 10;
+
+  /* --- animation setup --- */
+  transform-origin: top;
+  transform: scaleY(0);
+  opacity: 0;
+  pointer-events: none;           /* prevent clicks when closed */
+  transition: transform 160ms ease, opacity 160ms ease;
+  will-change: transform, opacity;
+}
+
+/* Open state = dropped down */
+.pref-dropdown.is-open .pref-dropdown__menu {
+  transform: scaleY(1);           /* "drop" open */
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Items */
+.pref-dropdown__item {
+  display: block;
+  padding: 0.5rem 0.6rem;
+  color: var(--text);
+  text-decoration: none;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  transition: background-color 120ms ease;
+}
+.pref-dropdown__item:hover {
+  background: color-mix(in oklab, var(--primary) 8%, var(--surface));
+}

@@ -1,14 +1,10 @@
 import Header from "../components/Header/Header.jsx";
-
+import RegistrationForm from "../components/RegistrationForm/RegistrationForm.jsx";
 
 function Registration() {
-
     return (
         <div>
-            <Header />
-            <div>
-                <h1>Registration Page</h1>
-            </div>
+            <RegistrationForm />
         </div>
     )
 }

@@ -1,22 +1,27 @@
 import { Link } from "react-router-dom";
 import "./Header.css";
+import {useContext} from "react";
+import { AuthContext } from "../../Contexts/AuthContext.jsx";
 
-function Header ({ isAuthenticated = false, onLogout }) {
+function Header () {
+    const {user, setUser} = useContext(AuthContext);
+    function handleLogout() {
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        setUser(null);
+    }
+    
     return (
         <nav className = "header">
+            <div className="username-display">
+               <p>Welcome, <strong>{user.username}</strong></p> 
+            </div>
             <div className = "navbar-links">
-                <Link to="/preferences">Preferences</Link>
+                <Link to="/events">Events</Link>
                 <Link to="/schedule">Schedule</Link>
             </div>
             <div className = "authentication-links">
-                {isAuthenticated ? (
-                    <Link to="/login" onClick={onLogout}>Logout</Link>
-                ) : (
-                     <>
-                        <Link to="/login">Log in</Link>
-                        <Link to="/registration">Register</Link>
-                    </>
-                )}
+                <Link to="/login" onClick={handleLogout}>Logout</Link>
             </div>
         </nav>
     )
