@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import './RegistrationForm.css';
+import { AuthContext } from "../../Contexts/AuthContext.jsx";
+
+
 
 function RegistrationForm() {
     const navigate = useNavigate();
@@ -8,6 +11,7 @@ function RegistrationForm() {
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
+    const { setUser } = useContext(AuthContext);
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -31,7 +35,13 @@ function RegistrationForm() {
             // Save tokens for later authenticated requests
             localStorage.setItem("access", data.access);
             localStorage.setItem("refresh", data.refresh);
-
+            
+            // Store user in context
+            setUser({
+                username: data.user.username,
+                email: data.user.email,
+                access: data.access,
+            });
             // Redirect after success
             navigate("/schedule");
         } catch (err) {

@@ -4,7 +4,6 @@ import RegistrationForm from "../components/RegistrationForm/RegistrationForm.js
 function Registration() {
     return (
         <div>
-            <Header />
             <RegistrationForm />
         </div>
     )
