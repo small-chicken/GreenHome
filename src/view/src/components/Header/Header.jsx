@@ -17,7 +17,7 @@ function Header () {
                <p>Welcome, <strong>{user.username}</strong></p> 
             </div>
             <div className = "navbar-links">
-                <Link to="/preferences">Preferences</Link>
+                <Link to="/events">Events</Link>
                 <Link to="/schedule">Schedule</Link>
             </div>
             <div className = "authentication-links">
