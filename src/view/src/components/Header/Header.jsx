@@ -13,7 +13,7 @@ function Header ({ isAuthenticated = false, onLogout }) {
                     <Link to="/" onClick={onLogout}>Logout</Link>
                 ) : (
                      <>
-                        <Link to="/">Log in</Link>
+                        <Link to="/login">Log in</Link>
                         <Link to="/registration">Register</Link>
                     </>
                 )}
