@@ -7,13 +7,38 @@ function RegistrationForm() {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
+    const [error, setError] = useState("");
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        if (username && password && email) {
-        navigate("/schedule");
+        setError("");
+
+        try {
+            const response = await fetch("http://127.0.0.1:8000/scheduler/register/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, email, password }),
+            });
+
+            if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || "Registration failed");
+            }
+
+            const data = await response.json();
+            console.log("✅ Registered:", data);
+
+            // Save tokens for later authenticated requests
+            localStorage.setItem("access", data.access);
+            localStorage.setItem("refresh", data.refresh);
+
+            // Redirect after success
+            navigate("/schedule");
+        } catch (err) {
+            console.error("Error:", err);
+            setError(err.message || "Something went wrong");
         }
-    };
+        };
 
     return (
         <div className='wrapper'>
@@ -56,5 +81,4 @@ function RegistrationForm() {
     );
 };
   
-
 export default RegistrationForm;
