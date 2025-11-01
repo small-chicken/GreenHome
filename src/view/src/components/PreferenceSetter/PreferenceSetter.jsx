@@ -13,7 +13,6 @@ function PreferenceSetter({appliance}) {
                 checked={checked}
                 onChange={() => {   
                     setChecked(!checked);
-                    alert("hello");
                 }}>
             </input>
         </div> 
