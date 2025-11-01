@@ -16,7 +16,6 @@ function App() {
         <Route path="/preferences" element={<Preferences />} />
         <Route path="/options" element={<Options />} />
         <Route path="/schedule" element={<Schedule />} />
-        <Route path="/calendar" element={<Calendar />} />
       </Routes>
     </main>
   )
