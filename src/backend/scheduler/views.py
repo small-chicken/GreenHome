@@ -69,14 +69,10 @@ class LoginView(APIView):
 
 
 class CarbonIntensityView(APIView):
-    """
-    View to fetch current carbon intensity data from the UK Carbon Intensity API.
-
-    Requires Authentication
-
-    Returns:
-        Response: JSON containing current carbon intensity and index.
-    """
+    # View to fetch current carbon intensity data from the UK Carbon Intensity API.
+    # Requires Authentication
+    # Returns:
+    #     Response: JSON containing current carbon intensity and index.
     permission_classes = [permissions.IsAuthenticated]
     
     def get(self, request):
