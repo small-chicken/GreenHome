@@ -1,0 +1,17 @@
+.preference-toggle {
+  position: relative;
+  z-index: 10;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  appearance: checkbox;
+  background: white;
+}
+
+.preference-setter {
+  position: relative;
+  background: #222;
+  color: white;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}

@@ -1,7 +1,7 @@
 import {useState} from "react";
 
 function PreferenceSetter({appliance}) {
-    const {checked, setChecked} = useState(false);
+    const [checked, setChecked] = useState(false);
 
     return (
         <div className = "preference-setter">
@@ -11,7 +11,10 @@ function PreferenceSetter({appliance}) {
             <input className = "preference-toggle"
                 type="checkbox"
                 checked={checked}
-                onChange={() => setChecked(!checked)}>
+                onChange={() => {   
+                    setChecked(!checked);
+                    alert("hello");
+                }}>
             </input>
         </div> 
     )
