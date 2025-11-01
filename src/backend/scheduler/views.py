@@ -92,7 +92,7 @@ class CarbonIntensityView(APIView):
 
 class EnergyLoadView(APIView):
     # A view to get the single most recent 30-minute National Grid load.
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         # Fetches ONLY the single most recent 30-minute grid load data point.
