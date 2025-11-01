@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.views import View
+from django.http import HttpResponse
 
 from django.http import JsonResponse
 from django.views import View
@@ -23,3 +25,7 @@ class CarbonIntensityView(View):
         except requests.RequestException as e:
             return JsonResponse({"error": str(e)}, status=500)
 
+
+class ScheduleView(View):
+    def get(self, request):
+        return HttpResponse("Initial schedule view ")
