@@ -1,7 +1,9 @@
+import {useState} from "react"
+
 function NewEvent() {
     return (
         <div>
-            <button className="new-event-button">+ New Event</button>
+            <button className="new-event-button" onClick>+ New Event</button>
         </div>
     )
 }

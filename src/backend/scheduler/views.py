@@ -1,4 +1,4 @@
-from django.conf import settings
+from backend.greenhome import settings
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
@@ -69,14 +69,10 @@ class LoginView(APIView):
 
 
 class CarbonIntensityView(APIView):
-    """
-    View to fetch current carbon intensity data from the UK Carbon Intensity API.
-
-    Requires Authentication
-
-    Returns:
-        Response: JSON containing current carbon intensity and index.
-    """
+    # View to fetch current carbon intensity data from the UK Carbon Intensity API.
+    # Requires Authentication
+    # Returns:
+    #     Response: JSON containing current carbon intensity and index.
     permission_classes = [permissions.IsAuthenticated]
     
     def get(self, request):
