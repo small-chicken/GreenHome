@@ -12,16 +12,3 @@
   --moss: #8FB996;
 }
 
-[data-theme="dark"] {
-  --bg: #0F1A14;
-  --surface: #15241B;
-  --text: #EAF2EC;
-  --text-muted: #B9C6BD;
-  --border: #2A3A31;
-
-  --primary: #2E7D32;
-  --primary-hover: #66BB6A;
-  --accent: #C6FF00;
-  --calm: #7ADBE6;
-  --moss: #8FB996;
-}

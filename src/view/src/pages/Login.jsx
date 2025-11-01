@@ -1,11 +1,13 @@
+import Header from "../components/Header/Header.jsx";
 import LoginForm from "../components/LoginForm/LoginForm";
 
 function Pages() {
     return (
         <div>
-            <h1>Login Page!</h1>
-            <LoginForm />
-            
+            <Header />
+            <div>
+                <LoginForm />
+            </div>
         </div>
     )
 }
