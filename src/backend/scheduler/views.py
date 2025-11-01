@@ -90,4 +90,4 @@ class CarbonIntensityView(APIView):
             return Response({"intensity": intensity, "index": index}, status=200)
 
         except requests.RequestException as e:
-            return Requests({"error": "Failed to fetch carbon intensity data"}, status=500)
+            return Response({"error": "Failed to fetch carbon intensity data"}, status=500)
