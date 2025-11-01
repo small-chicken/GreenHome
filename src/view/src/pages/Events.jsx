@@ -6,10 +6,10 @@ function Events () {
         <div>
             <Header />
             <div>
-                <EventSetter/>
+                <EventSetter />
             </div>
         </div>
     )
 }
 
-export default Event;
+export default Events;
