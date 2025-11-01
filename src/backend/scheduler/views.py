@@ -115,7 +115,7 @@ class EnergyLoadView(APIView):
         }
         
         try:
-            api_response = requests.get(base_url, params=params)
+            api_response = requests.get(base_url, params=params, timeout=20)
             api_response.raise_for_status()  # Check for HTTP errors
             
             data = api_response.json()
