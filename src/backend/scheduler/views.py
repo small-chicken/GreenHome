@@ -22,9 +22,10 @@ class CarbonIntensityView(View):
 
         except requests.RequestException as e:
             return JsonResponse({"error": str(e)}, status=500)
-        
 
-
+class EnergyPriceView(View):
+    def get(self, request):
+        return
 
 class ScheduleView(View):
     def get(self, request):
