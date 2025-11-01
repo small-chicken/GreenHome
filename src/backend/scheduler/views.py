@@ -5,7 +5,7 @@ from django.http import JsonResponse
 import requests
 
 class CarbonIntensityView(View):
-    def get_current_carbon(self):
+    def get(self, request):
         url = "https://api.carbonintensity.org.uk/intensity"
         try:
             response = requests.get(url)
@@ -23,8 +23,6 @@ class CarbonIntensityView(View):
         except requests.RequestException as e:
             return JsonResponse({"error": str(e)}, status=500)
         
-    def get_energy_price(self):
-        return
 
 
 
