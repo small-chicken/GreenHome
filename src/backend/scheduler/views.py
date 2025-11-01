@@ -1,4 +1,4 @@
-from backend.greenhome import settings
+from greenhome import settings
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
@@ -92,7 +92,7 @@ class CarbonIntensityView(APIView):
 
 class EnergyLoadView(APIView):
     # A view to get the single most recent 30-minute National Grid load.
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         # Fetches ONLY the single most recent 30-minute grid load data point.
