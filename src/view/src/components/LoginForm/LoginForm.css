@@ -35,13 +35,16 @@
 
 .input-box input,
 .password-box input {
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   width: 100%;
   appearance: none;
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 0.75rem;
-  padding: 0.875rem 0.95rem;
+  padding: 0.85rem 1rem;
   font-size: 1rem;
   line-height: 1.2;
   transition: border-color 160ms ease, box-shadow 160ms ease;

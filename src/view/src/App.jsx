@@ -9,7 +9,7 @@ function App() {
   return (
     <main className="main-content">
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/registration" element={<Registration />} />
         <Route path="/preferences" element={<Preferences />} />
         <Route path="/schedule" element={<Schedule />} />
