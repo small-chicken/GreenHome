@@ -6,9 +6,9 @@ function Registration() {
     return (
         <div>
             <Header />
-        <div>
-            <h1>Registration Page</h1>
-        </div>
+            <div>
+                <h1>Registration Page</h1>
+            </div>
         </div>
     )
 }

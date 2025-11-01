@@ -10,7 +10,7 @@ function Header ({ isAuthenticated = false, onLogout }) {
             </div>
             <div className = "authentication-links">
                 {isAuthenticated ? (
-                    <Link to="/" onClick={onLogout}>Logout</Link>
+                    <Link to="/login" onClick={onLogout}>Logout</Link>
                 ) : (
                      <>
                         <Link to="/login">Log in</Link>
