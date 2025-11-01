@@ -1,5 +1,3 @@
-/* LoginForm.css */
-
 .wrapper {
   font-family: var(--cc-font-family);
   min-height: 100dvh;
@@ -29,13 +27,11 @@
   letter-spacing: 0.2px;
 }
 
-.email-box,
 .input-box,
 .password-box {
   margin-bottom: 1rem;
 }
 
-.email-box input,
 .input-box input,
 .password-box input {
   align-items: center;
@@ -67,6 +63,7 @@
 }
 
 
+
 button[type="submit"] {
   width: 100%;
   display: inline-flex;
@@ -93,7 +90,7 @@ button[type="submit"]:active {
   transform: translateY(1px);
 }
 
-.register-link {
+.login-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -103,7 +100,7 @@ button[type="submit"]:active {
   font-size: 0.95rem;
 }
 
-.register-link button {
+.login-link button {
   background: transparent;
   color: var(--primary);
   border: 1px solid var(--border);
@@ -114,7 +111,7 @@ button[type="submit"]:active {
   transition: background-color 140ms ease, border-color 140ms ease;
 }
 
-.register-link button:hover {
+.login-link button:hover {
   background: color-mix(in oklab, var(--primary) 8%, var(--surface));
   border-color: var(--primary);
 }
