@@ -38,10 +38,7 @@
 .email-box input,
 .input-box input,
 .password-box input {
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
+  width: 60%;
   appearance: none;
   background: var(--surface);
   color: var(--text);
