@@ -1,0 +1,72 @@
+/* src/components/DayView.css */
+
+.dayview-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  font-family: "Inter", sans-serif;
+}
+
+.dayview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.dayview-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.nav-button {
+  background-color: #e5e7eb;
+  border: none;
+  border-radius: 8px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.nav-button:hover {
+  background-color: #d1d5db;
+}
+
+.dayview-content {
+  text-align: center;
+}
+
+.dayview-date {
+  color: #6b7280;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+}
+
+.dayview-events {
+  background-color: #f9fafb;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: left;
+}
+
+.dayview-events h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.dayview-events ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dayview-events li {
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-size: 0.9rem;
+}

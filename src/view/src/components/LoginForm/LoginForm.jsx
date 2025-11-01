@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import './LoginForm.css';
 
 const LoginForm=()=> {
+
+    const navigate = useNavigate();
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        if (username && password) {
+        navigate("/schedule");
+        }
+  };
+
     return (
         <div className='wrapper'>
-           <form action="">
+           <form onSubmit={onSubmit}>
                 <h1>Login</h1>
                 <div className="input-box">
                     <input 
@@ -17,13 +30,16 @@ const LoginForm=()=> {
                     <input 
                         type="password" 
                         placeholder="Password" 
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         required
                     />
                 </div>
                 <button type="submit">Login</button>
+
                 <div className="register-link">
                     <p>Don't have an account?</p>
-                    <button>Register</button>
+                    <button onClick={() => navigate('/Registration')}>Register</button>
                 </div>
            </form>
         </div>        
