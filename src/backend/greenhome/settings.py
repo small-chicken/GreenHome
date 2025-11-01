@@ -136,3 +136,5 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ),
 }
+
+ELEXON_API_KEY = "vnzi51z74k42oc7"
