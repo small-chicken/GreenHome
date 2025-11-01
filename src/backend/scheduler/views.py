@@ -1,4 +1,4 @@
-from backend.greenhome import settings
+from greenhome import settings
 from django.shortcuts import render
 from django.views import View
 from django.http import HttpResponse
