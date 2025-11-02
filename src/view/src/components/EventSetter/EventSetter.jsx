@@ -3,13 +3,33 @@ import './EventSetter.css';
 
 function EventSetter() {
     const appliances = [
-      {name: "Washing Machine", id: 0},
-      {name: "Dishwasher", id: 1},
-      {name: "Dryer", id: 2},
-      {name: "Electric Vehicle", id: 3},
-      {name: "Heating System", id: 4},
-      {name: "Kitchen Appliances", id: 5},
+      {name: "Washing Machine", runtime_min: 120},
+      {name: "Dishwasher", runtime_min: 90},
+      {name: "Dryer", runtime_min: 60},
+      {name: "Electric Vehicle",runtime_min: 240},
+      {name: "Heating System", runtime_min: 180 },
+      {name: "Kitchen Appliances",  runtime_min: 45 },
     ]
+  const dayIndexFromToken = (token) => (token === "tomorrow" ? 1 : 0);
+  
+  const addDays = (date, days) => {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  };
+
+
+  const TfromISO = (dayToken, hhmm) => {
+  if (!hhmm) return null;
+  const [h, m] = hhmm.split(":").map(Number);
+
+  const baseMidnight = new Date();
+  baseMidnight.setHours(0, 0, 0, 0);
+
+  const d = addDays(baseMidnight, dayIndexFromToken(dayToken));
+  d.setHours(h, m, 0, 0);
+  return d.toISOString();
+};
 
   const buildSlots = (start = "00:00", end = "23:30", stepMin = 30) => {
   const toMin = (t) => {
@@ -78,29 +98,25 @@ function EventSetter() {
 
 
   const handleSubmit = async () => {
-  if (!canSubmit) return;
+  if(!canSubmit || !appliance) return;
 
-  let payload = {
-    appliance: appliance ? { id: appliance.id, name: appliance.name } : null,
+   const base = {
+    name: appliance.name,
+    runtime_min: appliance.runtime_min,
   };
 
-  if (timePref) {
-    payload = {
-      ...payload,
-      timePreferences: {
-        start: {
-          dayToken: startDay,
-          time: startTime,                 // "HH:MM"
-        },
-        end: {
-          dayToken: endDay,
-          time: endTime,
-        },
-      },
-    };
-  } else {
-    payload = { ...payload, timePreferences: null };
-  }
+  const payload = timePref
+    ? {
+        ...base,
+        earliest_start: TfromISO(startDay, startTime), // ISO string
+        latest_end:     TfromISO(endDay,   endTime),
+      }
+    : {
+        ...base,
+        earliest_start: null,
+        latest_end: null,
+      };
+
   console.log("Submitting event →", payload);
 };
 
@@ -130,7 +146,7 @@ function EventSetter() {
         <div className="event-dropdown__menu" role="menu">
           {appliances.map((a) => (
             <button
-              key={a.id}
+              key={a.name}
               type="button"
               role="menuitem"
               className="event-dropdown__item"
@@ -161,7 +177,7 @@ function EventSetter() {
       {timePref && (
         <div className="timepicker timepicker--range">
           <div className="timefield">
-            <label>Start</label>
+            <label>Earliest Start</label>
             <select
               id="startDay"
               value={startDay}
@@ -186,7 +202,7 @@ function EventSetter() {
           </select>
           </div>
           <div className="timefield">
-            <label>End</label>
+            <label>Latest End</label>
             <select
               id="endDay"
               value={endDay}
