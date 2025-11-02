@@ -6,6 +6,6 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(), name='login'),
     path('register/', views.RegisterView.as_view(), name='register'),
     path('historic-data/', views.HistoricCarbonIntensity.as_view(), name='historic-data'),
-    path('schedule/', views.ScheduleTaskView.as_view(), name='schedule-events'),
+    path('schedule/', views.ScheduleTaskView(), name='schedule-events'),
     path("events/", views.UserEventsView.as_view(), name="user-events-by-name")
 ]
