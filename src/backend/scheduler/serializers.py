@@ -47,13 +47,8 @@ class LoginSerializer(serializers.Serializer):
         return data
     
 class EventInstanceSerializer(serializers.ModelSerializer):
-    appliance_name = serializers.CharField(source="appliance_id.apliance_name", read_only=True)
+    appliance_name = serializers.CharField(source='appliance.name', read_only=True)
 
     class Meta:
         model = EventInstance
-        fields = ["id", "user","appliance_name", "start_time"]
-        read_only_fields = ['id', 'user']
-    
-    def create(self, validated_data):
-
-        return EventInstance.objects.create(**validated_data)
+        fields = ["event_instance_id", "username", "appliance_name", "start_time", "end_time", "green_score", "status"]
