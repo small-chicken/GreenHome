@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from .scheduler_utils import scheduler
 
 def _datetime_to_slot_index(dt: datetime, forecast_start: datetime) -> int:
     # Converts an absolute datetime into a relative 30-minute slot index based on the forecast's start time.

@@ -116,81 +116,83 @@ class HistoricCarbonIntensity(APIView):
         except requests.RequestException as e:
             return Response({"error": "Failed to fetch carbon intensity data"}, status=500)
         
-class ScheduleEventsView(APIView):
-    permission_classes = [permissions.AllowAny]  # temporarily disabled auth
+# In your_app/views.py
 
-    def post(self, request):
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status, permissions
+from .models import CarbonPredictions  # <-- Your Model
+from .scheduler_utils import scheduler # <-- Your Algorithm
+
+class ScheduleTaskView(APIView):
+    """
+    API view to schedule a single task or a list of tasks.
+    Receives task details via POST and returns the optimal start time(s).
+    """
+    permission_classes = [permissions.AllowAny] # Or AllowAny for testing
+
+    def post(self, request, *args, **kwargs):
+        
+        # --- 1. GET DATA FROM THE *NESTED* JSON PAYLOAD ---
+        
+        # Get the list of appliances from the "appliances" key
+        appliances_data = request.data.get('appliances')
+
+        if not isinstance(appliances_data, list):
+            return Response(
+                {"error": "Invalid payload. Expected a JSON object with an 'appliances' list."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # This will hold the tasks in the format our scheduler function needs
+        appliances_list = []
+        
         try:
-            appliances = request.data.get("appliances", [])
-            if not appliances:
-                return Response({"error": "No appliances provided"}, status=status.HTTP_400_BAD_REQUEST)
+            # Loop through each appliance in the list (even if it's just one)
+            for task in appliances_data:
+                appliance_from_form = {
+                    # FIX 1: Look for 'name', not 'appliance_type'
+                    'name': task.get('name', 'user_task'), 
+                    # FIX 2: Get data from the 'task' dictionary
+                    'runtime_min': int(task.get('runtime_min')), 
+                    'earliest_start': task.get('earliest_start'),
+                    'latest_end': task.get('latest_end')
+                }
+                appliances_list.append(appliance_from_form)
+            
+        except (TypeError, ValueError, KeyError) as e:
+            return Response(
+                {"error": f"Invalid form data in appliance list: {e}. Check for missing fields or correct types."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-            # --- Try to get 48-hour carbon intensity forecast from the API ---
-            forecast_url = "https://api.carbonintensity.org.uk/intensity/fw48h"
-            carbon_forecast = []
-            forecast_start_time = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
+        # 2. Query the Database for the Latest Forecast (This part is correct)
+        try:
+            current_forecast_qs = CarbonPredictions.objects.order_by('timestamp')
 
-            try:
-                resp = requests.get(forecast_url, timeout=10)
-                resp.raise_for_status()
-                forecast_data = resp.json().get("data", [])
+            if not current_forecast_qs.exists():
+                raise CarbonPredictions.DoesNotExist
+                
+            carbon_forecast_list = [f.carbon_intensity for f in current_forecast_qs]
+            forecast_start_dt = current_forecast_qs.first().timestamp
 
-                if forecast_data:
-                    carbon_forecast = [period["intensity"]["forecast"] for period in forecast_data]
-                    forecast_start_time = datetime.fromisoformat(
-                        forecast_data[0]["from"].replace("Z", "+00:00")
-                    )
-                    print(f"✅ Successfully fetched {len(carbon_forecast)} forecast slots.")
-                else:
-                    raise ValueError("Empty forecast data")
-
-            except Exception as e:
-                # --- Fallback dummy pattern if the API fails ---
-                print(f"⚠️ Carbon API failed ({e}), using fallback forecast data instead.")
-
-                peak_cost = 100
-                mid_cost = 50
-                low_cost = 20
-
-                day_pattern = (
-                    [low_cost] * 12 +       # 00:00 - 05:45 (Overnight low)
-                    [peak_cost] * 6 +       # 06:00 - 08:45 (Morning peak)
-                    [mid_cost] * 8 +        # 09:00 - 12:45 (Daytime)
-                    [low_cost] * 8 +        # 13:00 - 16:45 (Solar peak / Midday low)
-                    [peak_cost] * 10 +      # 17:00 - 21:45 (Evening peak)
-                    [mid_cost] * 4          # 22:00 - 23:45 (Dropping off)
-                )
-                carbon_forecast = day_pattern * 2  # 48 hours = 96 half-hour slots
-                forecast_start_time = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
-
-            # --- Sanity check ---
-            if len(carbon_forecast) != 96:
-                return Response({"error": f"Invalid forecast length ({len(carbon_forecast)})"}, status=500)
-
-            # --- Run the scheduler ---
-            optimal_schedule = scheduler(appliances, carbon_forecast, forecast_start_time)
-
-            saved_events = []
-            for app in appliances:
-                name = app["name"]
-                best_start = optimal_schedule.get(name)
-                if not best_start:
-                    continue
-
-                start_time = datetime.fromisoformat(best_start)
-                end_time = start_time + timedelta(minutes=app["runtime_min"])
-
-                saved_events.append({
-                    "appliance": name,
-                    "start_time": start_time.isoformat(),
-                    "end_time": end_time.isoformat()
-                })
-
-            return Response({
-                "message": "✅ Events scheduled successfully",
-                "schedule": saved_events
-            }, status=200)
-
+        except CarbonPredictions.DoesNotExist:
+            return Response(
+                {"error": "Carbon forecast is not available. Please try again in a few minutes."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE
+            )
         except Exception as e:
-            print("Scheduler error:", e)
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(
+                {"error": f"Error loading forecast data: {e}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        # 4. Run the Scheduler (This part is correct)
+        schedule_result = scheduler(
+            appliances_list, 
+            carbon_forecast_list, 
+            forecast_start_dt
+        )
+
+        # 5. Return the Optimal Time(s)
+        return Response(schedule_result, status=status.HTTP_200_OK)
