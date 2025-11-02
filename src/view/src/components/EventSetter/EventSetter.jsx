@@ -10,6 +10,9 @@ function EventSetter() {
       {name: "Heating System", runtime_min: 180 },
       {name: "Kitchen Appliances",  runtime_min: 45 },
     ]
+
+  const START_OF_DAY = "00:00";
+  const END_OF_DAY   = "23:30";
   const dayIndexFromToken = (token) => (token === "tomorrow" ? 1 : 0);
   
   const addDays = (date, days) => {
@@ -17,6 +20,15 @@ function EventSetter() {
     d.setDate(d.getDate() + days);
     return d;
   };
+
+  const roundUpToSlotHHMM = (d = new Date(), step = 30) => {
+  const mins = d.getMinutes();
+  const add = (step - (mins % step)) % step;
+  d.setMinutes(mins + add, 0, 0);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  return `${hh}:${mm}`;
+};
 
 
   const TfromISO = (dayToken, hhmm) => {
@@ -65,7 +77,7 @@ function EventSetter() {
    const [startDay, setStartDay] = React.useState(dayOptions[0].value);
    const [endDay, setEndDay] = React.useState(dayOptions[0].value); 
    const [appliance, setAppliance] = React.useState(null);
-   const hasEarliest = timePref && !!startTime; // day already defaults
+   const hasEarliest = timePref && !!startTime;
    const hasLatest   = timePref && !!endTime;
    const ref = React.useRef(null);
 
@@ -81,16 +93,15 @@ function EventSetter() {
         setTimeout(() => document.activeElement?.blur(), 0);
       }
     };
-    document.addEventListener("mousedown", onDocClick);
+    document.addEventListener("click", onDocClick);
     document.addEventListener("keydown", onKey);
     return () => {
-      document.removeEventListener("mousedown", onDocClick);
+      document.removeEventListener("click", onDocClick);
       document.removeEventListener("keydown", onKey);
     };
     }, []);
 
-  const timePrefValid = timePref ? (hasEarliest || hasLatest) : true;
-  const canSubmit = !!appliance && timePrefValid;
+  const canSubmit = !!appliance;
   const btnLabel = timePref
   ? hasEarliest && hasLatest
       ? "Add event with time window"
@@ -98,32 +109,43 @@ function EventSetter() {
           ? "Add event with earliest start"
           : hasLatest
               ? "Add event with latest end"
-              : "Add event (no bounds)"
+              : "Add event"
   : "Add event with no time preferences";
 
 
   const handleSubmit = async () => {
-  if(!canSubmit || !appliance) return;
+  if (!canSubmit || !appliance) return;
 
-   const base = {
+  let earliestISO, latestISO;
+
+  if (!timePref) {
+    // no time prefs → start = now rounded to slot, end = tomorrow 23:30
+    const nowSlot = roundUpToSlotHHMM(new Date(), 30);
+    const startDayToken =
+      nowSlot === "00:00" ? "tomorrow" : "today"; // if rounding crossed midnight
+    earliestISO = TfromISO(startDayToken, nowSlot);
+    latestISO   = TfromISO("tomorrow", END_OF_DAY);
+  } else {
+    // user provided some/all bounds
+    const effectiveStartDay = startDay;
+    const effectiveEndDay   = hasLatest ? endDay : startDay;
+    const effectiveStartHH  = hasEarliest ? startTime : START_OF_DAY;
+    const effectiveEndHH    = hasLatest   ? endTime   : END_OF_DAY;
+
+    earliestISO = TfromISO(effectiveStartDay, effectiveStartHH);
+    latestISO   = TfromISO(effectiveEndDay,   effectiveEndHH);
+  }
+
+  const payload = {
     name: appliance.name,
     runtime_min: appliance.runtime_min,
+    earliest_start: earliestISO,
+    latest_end: latestISO,
   };
-
-  const payload = timePref
-    ? {
-        ...base,
-        earliest_start: hasEarliest ? TfromISO(startDay, startTime) : null,
-        latest_end:     hasEarliest ? TfromISO(startDay, startTime) : null,
-      }
-    : {
-        ...base,
-        earliest_start: null,
-        latest_end: null,
-      };
 
   console.log("Submitting event →", payload);
 };
+
 
     return (
     <div className="event-setter">
