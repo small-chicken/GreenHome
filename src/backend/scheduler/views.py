@@ -82,7 +82,7 @@ class CarbonIntensityView(APIView):
     # View to fetch current carbon intensity data from the UK Carbon Intensity API.
     # Requires Authentication
     # Returns:
-    #     Response: JSON containing current carbon intensity and index.
+    # Response: JSON containing current carbon intensity and index.
     permission_classes = [permissions.AllowAny]
     
     def get(self, request):
@@ -125,12 +125,17 @@ from rest_framework import status, permissions
 from .models import CarbonPredictions  # <-- Your Model
 from .scheduler_utils import scheduler # <-- Your Algorithm
 
+def T(days=0, hours=0, minutes=0):
+    dt = FORECAST_START + timedelta(days=days, hours=hours, minutes=minutes)
+    return dt.isoformat()
+
 class ScheduleTaskView(APIView):
     """
     API view to schedule a single task or a list of tasks.
     Receives task details via POST and returns the optimal start time(s).
     """
     permission_classes = [permissions.AllowAny] # Or AllowAny for testing
+    serializer_class = EventInstanceSerializer
 
     def post(self, request, *args, **kwargs):
         
@@ -151,6 +156,7 @@ class ScheduleTaskView(APIView):
         try:
             # Loop through each appliance in the list (even if it's just one)
             for task in appliances_data:
+
                 appliance_from_form = {
                     # FIX 1: Look for 'name', not 'appliance_type'
                     'name': task.get('name', 'user_task'), 
@@ -188,14 +194,38 @@ class ScheduleTaskView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # 4. Run the Scheduler (This part is correct)
         schedule_result = scheduler(
             appliances_list, 
             carbon_forecast_list, 
             forecast_start_dt
         )
+        saved_events = []
+        errors = []
 
-        # 5. Return the Optimal Time(s)
+        for appliance_name, start_time in schedule_result.items():
+            
+            if start_time is None:
+                continue
+            
+            event_data = {
+                'appliance_name': appliance_name,  
+                'start_time': start_time,
+            }
+            
+            serializer = self.serializer_class(data=event_data)
+            if serializer.is_valid():
+                serializer.save(user=request.user) 
+                saved_events.append(serializer.data)
+            else:
+                errors.append({appliance_name: serializer.errors})
+
+        if errors:
+            return Response(
+                {"error": "Could not save one or more events.", "details": errors}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        
         return Response(schedule_result, status=status.HTTP_200_OK)
         
 
