@@ -1,22 +1,22 @@
-/* Make the container fill the whole screen */
+
 .dayview-container {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* Vertically center the content */
-  height: 100vh;  /* Fill the entire viewport height */
-  padding: 40px;  /* Add padding around the container */
+  align-items: center; 
+  height: 100vh;  
+  padding: 40px;  
   box-sizing: border-box;
 }
 
 .dayview {
-  width: 48%;  /* Increase width to take up more space */
-  height: 90%; /* Make each DayView taller to fill the screen */
+  width: 48%;  
+  height: 90%; 
   border: 1px solid #ddd;
-  padding: 30px; /* Increase padding for more space inside each box */
-  box-sizing: border-box; /* Ensure padding doesn't affect the width */
-  font-size: 1.2rem; /* Larger text for better readability */
+  padding: 30px; 
+  box-sizing: border-box; 
+  font-size: 1.2rem; 
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Ensure events are spaced correctly within each box */
+  justify-content: space-between; 
 }
 
