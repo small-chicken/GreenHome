@@ -1,23 +1,51 @@
-
 .dayview-container {
   display: flex;
   justify-content: space-between;
-  align-items: center; 
-  height: 100vh;  
-  padding: 40px;  
+  align-items: center;
+  height: 100vh;
+  padding: 20px;                 
   box-sizing: border-box;
 }
 
 .dayview {
-  width: 48%;  
-  height: 90%; 
+  width: 48%;
+  height: 90%;
   border: 1px solid #ddd;
-  padding: 30px; 
-  box-sizing: border-box; 
-  font-size: 1.2rem; 
+  padding: 16px;               
+  box-sizing: border-box;
   font-family: var(--cc-font-family);
+
   display: flex;
   flex-direction: column;
-  justify-content: space-between; 
+  gap: 8px;                      
 }
 
+.dayview__header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.dayview__title {
+  font-size: 0.95rem;            
+  line-height: 1.25;
+  margin: 0;
+  font-weight: 700;
+}
+
+.dayview__date {
+  font-size: 0.85rem;            
+  color: var(--text-muted, #666);
+}
+
+.dayview__events {
+  flex: 1;                       
+  overflow: auto;                
+  padding-right: 4px;          
+}
+
+.dayview__events .event {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.95rem;            
+}

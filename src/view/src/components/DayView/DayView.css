@@ -1,70 +1,90 @@
-
 .dayview-container {
   display: flex;
-  justify-content: space-between; 
-  align-items: center; 
-  height: 100vh;  
-  padding: 20px; 
+  align-items: stretch;          /* allow cards to fill height */
+  justify-content: space-between;
+  gap: 16px;                     /* consistent spacing between columns */
+  height: 100vh;
+  padding: 16px;                 /* a bit tighter */
   box-sizing: border-box;
 }
 
 .dayview {
-  width: 60%;  
-  height: 90%; 
-  padding: 20px; 
-  box-sizing: border-box; 
-  font-size: 1.2rem; 
+  flex: 1 1 0;                   /* let both columns share space */
+  min-width: 320px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; 
-  
-  
-  border-radius: 12px;  
-  border: 2px solid #4CAF50;  
-  background-color: #f1f8f4; 
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+
+  padding: 14px;                 /* tighter padding */
+  box-sizing: border-box;
+
+  border-radius: 12px;
+  border: 2px solid #4CAF50;
+  background-color: #f1f8f4;
+  box-shadow: 0 4px 8px rgba(0,0,0,.08);
 }
 
+/* Compact header: title + date on one line */
+.dayview-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;            /* small separation from list */
+}
 
 .dayview-title {
-  font-size: 2rem; 
-  font-family: var(--cc-font-family);
-  font-weight: bold;
-  margin-bottom: 1px; 
-  color: #2e7d32;  
+  font-size: 1rem;               /* smaller title */
+  line-height: 1.1;
+  font-weight: 700;
+  margin: 0;
+  color: #2e7d32;
 }
-
 
 .dayview-date {
-  font-size: 1.5rem; 
-  font-family: var(--cc-font-family);
-  margin-bottom: 2px; 
-  color: #388e3c;  
+  font-size: 0.85rem;            /* smaller date */
+  line-height: 1.1;
+  color: #388e3c;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
 }
 
+.dayview-date .dw-dot { opacity: 0.6; }
 
+/* Events section grows and scrolls if needed */
+.dayview-events {
+  flex: 1;                       /* take all remaining space */
+  min-height: 0;                 /* enable child overflow */
+  overflow: auto;                /* scroll when long */
+  padding-top: 4px;
+}
+
+/* Optional: hide the "Events" heading to reclaim space */
 .dayview-events h3 {
-  font-family: var(--cc-font-family);
-  font-size: 1.4rem; 
-  margin-bottom: 5px; 
-  color: #388e3c;  
+  display: none;
 }
 
 .dayview-events ul {
-  list-style-type: none;
-  padding-left: 0;
-  font-size: 1rem; 
-  margin: 0; 
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .dayview-events li {
-  margin: 5px 0; 
-  color: #2e7d32;  
+  font-size: 0.95rem;
+  line-height: 1.35;
+  padding: 6px 8px;
+  margin: 2px 0;
+  color: #2e7d32;
+  border-radius: 8px;
+  background: rgba(76, 175, 80, 0.08);
 }
 
 
+/* Subtle hover on the whole card */
 .dayview:hover {
-  border-color: #388e3c; 
-  background-color: #e8f5e9; 
-  transition: background-color 0.3s, border-color 0.3s;
+  border-color: #388e3c;
+  background-color: #e8f5e9;
+  transition: background-color .2s, border-color .2s;
 }
