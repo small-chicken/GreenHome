@@ -1,45 +1,30 @@
-// src/components/DayView.jsx
-import React, { useState } from "react";
-import { format, addDays, subDays, isToday } from "date-fns";
-import "./DayView.css"; // 👈 Import the stylesheet
+import React from "react";
+import { format, addDays } from "date-fns";
+import "./DayView.css"; 
 
-function DayView() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-
-  const nextDay = () => setCurrentDate(addDays(currentDate, 1));
-  const prevDay = () => setCurrentDate(subDays(currentDate, 1));
+function DayView({ today, events }) {
+  // Get today's date
+  const currentDate = today ? new Date() : addDays(new Date(), 1); 
 
   return (
-    <div className="dayview-container">
-      {/* Header */}
-      <div className="dayview-header">
-        <button className="nav-button" onClick={prevDay}>
-          ‹
-        </button>
-        <h2 className="dayview-title">
-          {isToday(currentDate)
-            ? "Today"
-            : format(currentDate, "EEEE, MMMM d, yyyy")}
-        </h2>
-        <button className="nav-button" onClick={nextDay}>
-          ›
-        </button>
+    <div className="dayview">
+      <h2 className="dayview-title">{today ? "Today" : "Tomorrow"}</h2>
+      <div className="dayview-date">
+        <p>{format(currentDate, "EEEE")}</p>
+        <p>{format(currentDate, "MMMM d, yyyy")}</p>
       </div>
 
-      {/* Content */}
-      <div className="dayview-content">
-        <p className="dayview-date">
-          {format(currentDate, "EEEE")} — {format(currentDate, "MMMM d, yyyy")}
-        </p>
-
-        <div className="dayview-events">
-          <h3>Events</h3>
-          <ul>
-            <li>🕒 9:00 AM — Morning meeting</li>
-            <li>🍽️ 12:00 PM — Lunch break</li>
-            <li>💻 3:00 PM — Code session</li>
-          </ul>
-        </div>
+      <div className="dayview-events">
+        <h3>Events</h3>
+        <ul>
+          {events.length > 0 ? (
+            events.map((event, index) => (
+              <li key={index}>{event}</li>
+            ))
+          ) : (
+            <li>No events for today!</li>
+          )}
+        </ul>
       </div>
     </div>
   );

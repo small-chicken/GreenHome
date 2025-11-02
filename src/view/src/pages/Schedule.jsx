@@ -1,12 +1,12 @@
 import Header from "../components/Header/Header.jsx";
-import DayView from "../components/DayView/DayView.jsx";
+import DayViewContainer from "../components/DayViewContainer/DayViewContainer.jsx";
 
 
 function Schedule() {
     return (
         <div>
             <Header />
-            <DayView />
+            <DayViewContainer />
             
         </div>
     )

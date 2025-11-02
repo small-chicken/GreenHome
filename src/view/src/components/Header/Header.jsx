@@ -14,7 +14,7 @@ function Header () {
     return (
         <nav className = "header">
             <div className="username-display">
-               <p>Welcome, <strong>{user.username}</strong></p> 
+               <p>Hi, <strong>{user.username}</strong></p> 
             </div>
             <div className = "navbar-links">
                 <Link to="/events">Events</Link>
