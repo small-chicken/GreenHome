@@ -28,8 +28,7 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        
-        user = serializer.save()
+
 
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -52,11 +51,14 @@ class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        print("DEBUG FRONTEND DATA:", request.data)
+        serializer = self.serializer_class(data=request.data, context={'request': request})
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data['username']    
-        password = serializer.validated_data['password']
-        user = authenticate(request, username=username, password=password)
+        user = serializer.validated_data['user']
+        #username = serializer.validated_data['username']    
+        #user = authenticate(request, username=username, password=password)
+        ##password = serializer.validated_data['password']
 
         if user is not None:
             refresh = RefreshToken.for_user(user)
