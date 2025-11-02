@@ -140,8 +140,7 @@ function EventSetter() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // optional — include JWT if authentication is enabled again
-        // "Authorization": `Bearer ${localStorage.getItem("access")}`,
+        "Authorization": `Bearer ${accessToken}`,
       },
       body: JSON.stringify({ appliances: [payload] }), // Django expects a list
     });

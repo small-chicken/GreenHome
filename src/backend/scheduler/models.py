@@ -32,9 +32,7 @@ class EventInstance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     appliance = models.ForeignKey(Appliance, on_delete=models.CASCADE)
     start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    green_score = models.FloatField()
-    status = models.CharField(max_length=50, default = "scheduled")  # e.g., scheduled, completed, cancelled
+
 
     def __str__(self):
         return f"Event for {self.appliance.name} by {self.user.username} at {self.start_time}"
