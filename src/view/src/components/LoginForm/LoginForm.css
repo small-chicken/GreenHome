@@ -33,12 +33,13 @@
 .input-box,
 .password-box {
   margin-bottom: 1rem;
+  margin-right:2rem;
 }
 
 .email-box input,
 .input-box input,
 .password-box input {
-  width: 60%;
+  width: 100%;
   appearance: none;
   background: var(--surface);
   color: var(--text);

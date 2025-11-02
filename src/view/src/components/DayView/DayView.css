@@ -28,6 +28,7 @@
 
 .dayview-title {
   font-size: 2rem; 
+  font-family: var(--cc-font-family);
   font-weight: bold;
   margin-bottom: 1px; 
   color: #2e7d32;  
@@ -36,12 +37,14 @@
 
 .dayview-date {
   font-size: 1.5rem; 
+  font-family: var(--cc-font-family);
   margin-bottom: 2px; 
   color: #388e3c;  
 }
 
 
 .dayview-events h3 {
+  font-family: var(--cc-font-family);
   font-size: 1.4rem; 
   margin-bottom: 5px; 
   color: #388e3c;  
