@@ -125,7 +125,7 @@ from rest_framework import status, permissions
 from .models import CarbonPredictions  # <-- Your Model
 from .scheduler_utils import scheduler # <-- Your Algorithm
 
-class ScheduleTaskView(APIView):
+class ScheduleEventsView(APIView):
     """
     API view to schedule a single task or a list of tasks.
     Receives task details via POST and returns the optimal start time(s).

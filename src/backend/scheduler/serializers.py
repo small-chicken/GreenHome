@@ -51,4 +51,4 @@ class EventInstanceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EventInstance
-        fields = ['appliance_name', 'start_time', 'end_time']
+        fields = ['appliance_name', 'start_time']
