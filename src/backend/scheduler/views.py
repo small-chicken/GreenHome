@@ -94,3 +94,18 @@ class CarbonIntensityView(APIView):
         except requests.RequestException as e:
             return Response({"error": "Failed to fetch carbon intensity data"}, status=500)
 
+class HistoricCarbonIntensity(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        url = "https://api.carbonintensity.org.uk/intensity/2017-08-25T12:35Z/2017-15-25T12:35Z"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            data = response.json()
+
+            
+
+            return 
+        except requests.RequestException as e:
+            return Response({"error": "Failed to fetch carbon intensity data"}, status=500)
