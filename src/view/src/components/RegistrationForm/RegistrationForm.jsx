@@ -7,11 +7,14 @@ import { AuthContext } from "../../Contexts/AuthContext.jsx";
 
 function RegistrationForm() {
     const navigate = useNavigate();
+    const { setUser } = useContext(AuthContext);
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
-    const { setUser } = useContext(AuthContext);
+
+    
 
     const onSubmit = async (e) => {
         e.preventDefault();
