@@ -4,17 +4,6 @@ import "./DayView.css";
 
 function DayView({ today, events }) {
   const currentDate = today ? new Date() : addDays(new Date(), 1); 
-  
-  const parseEventTime = (text, baseDate) => {
-    const m12 = text.match(/\b(\d{1,2}:\d{2}\s*[AP]M)\b/i);
-    if (m12) return parse(m12[1].toUpperCase(), "h:mm a", baseDate);
-
-    const m24 = text.match(/\b([01]?\d|2[0-3]):[0-5]\d\b/);
-    if (m24) return parse(m24[0], "HH:mm", baseDate);
-
-    return null;
-  };
-
   const now = new Date();
   const isTodayCard = isSameDay(currentDate, now);
 
@@ -32,11 +21,13 @@ function DayView({ today, events }) {
         <ul>
           {events.length > 0 ? (
             events.map((event, index) => {
-              const eventTime = parseEventTime(event, currentDate);
-              const isPast = isTodayCard && eventTime && isBefore(eventTime, now);
+              const start = new Date(event.start_time);
+              const isPast = isTodayCard && isBefore(start, now);
+
               return (
                 <li key={index} className={`event-item ${isPast ? "is-past" : ""}`}>
-                  {event}
+                  <strong>{event.appliance_name}</strong> —{" "}
+                  {format(start, "h:mm a")}
                 </li>
               );
             })
@@ -48,5 +39,6 @@ function DayView({ today, events }) {
     </div>
   );
 }
+
 
 export default DayView;

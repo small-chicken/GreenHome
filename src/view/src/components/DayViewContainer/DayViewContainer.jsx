@@ -1,25 +1,40 @@
-import React from "react";
+import React, {useState, useEffect, useContext} from "react";
 import DayView from "../DayView/DayView.jsx";
 import "./DayViewContainer.css";
+import {startOfDay, addDays, isSameDay} from 'date-fns'
+import { AuthContext } from "../../Contexts/AuthContext.jsx";
 
 function DayViewContainer(){
+    const [events, setEvents] = useState([]);
 
-    const todayEvents = [
-    "🕒 9:00 AM — Morning meeting",
-    "🍽️ 12:00 PM — Lunch break",
-    "💻 3:00 PM — Code session",
-    ];
+    const {user, setUser} = useContext(AuthContext);
+    useEffect(() => {
+    const username = user.username;
 
-    const tomorrowEvents = [
-    "🕒 10:00 AM — Review meeting",
-    "🍽️ 1:00 PM — Lunch with team",
-    "💻 4:00 PM — Finalize project",
-    ];
+    fetch(`http://127.0.0.1:8000/scheduler/events/?username=${username}`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Fetched events:", data);
+        setEvents(data);
+      })
+      .catch((err) => console.error("Error fetching events:", err));
+  }, []);
+
+    const today = startOfDay(new Date());
+    const tomorrow = addDays(today, 1);
+
+    const eventsToday = events.filter((e) =>
+    isSameDay(new Date(e.start_time), today)
+  );
+  const eventsTomorrow = events.filter((e) =>
+    isSameDay(new Date(e.start_time), tomorrow)
+  );
+
 
     return (
         <div className="dayview-container">
-            <DayView today={true} events={todayEvents} />
-            <DayView today={false} events={tomorrowEvents} />
+            <DayView today={true} events={eventsToday} />
+            <DayView today={false} events={eventsTomorrow} />
         </div>
     )
 }
