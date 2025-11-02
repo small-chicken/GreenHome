@@ -65,13 +65,14 @@ function EventSetter() {
    const [startDay, setStartDay] = React.useState(dayOptions[0].value);
    const [endDay, setEndDay] = React.useState(dayOptions[0].value); 
    const [appliance, setAppliance] = React.useState(null);
+   const hasEarliest = timePref && !!startTime; // day already defaults
+   const hasLatest   = timePref && !!endTime;
    const ref = React.useRef(null);
 
    React.useEffect(() => {
     const onDocClick = (e) => {
       if (ref.current && !ref.current.contains(e.target)){
         setOpen(false);
-        setTimeout(() => document.activeElement?.blur(), 0);
       }
     };
     const onKey = (e) => {
@@ -88,13 +89,17 @@ function EventSetter() {
     };
     }, []);
 
-  const timePrefValid = timePref ? startTime && endTime : true;
+  const timePrefValid = timePref ? (hasEarliest || hasLatest) : true;
   const canSubmit = !!appliance && timePrefValid;
   const btnLabel = timePref
-    ? startTime && endTime
-      ? "Add event with time preferences"
-      : "Select both times…"
-    : "Add event with no time preferences";
+  ? hasEarliest && hasLatest
+      ? "Add event with time window"
+      : hasEarliest
+          ? "Add event with earliest start"
+          : hasLatest
+              ? "Add event with latest end"
+              : "Add event (no bounds)"
+  : "Add event with no time preferences";
 
 
   const handleSubmit = async () => {
@@ -108,8 +113,8 @@ function EventSetter() {
   const payload = timePref
     ? {
         ...base,
-        earliest_start: TfromISO(startDay, startTime), // ISO string
-        latest_end:     TfromISO(endDay,   endTime),
+        earliest_start: hasEarliest ? TfromISO(startDay, startTime) : null,
+        latest_end:     hasEarliest ? TfromISO(startDay, startTime) : null,
       }
     : {
         ...base,
@@ -133,9 +138,10 @@ function EventSetter() {
           aria-haspopup="menu"
           aria-expanded={open}
           onClick={(e) => {
+            const btn = e.currentTarget; 
             setOpen(prev => {
               const next = !prev;
-              if (!next) e.currentTarget.blur(); 
+              if (!next) btn.blur(); 
               return next;
             });
           }}
