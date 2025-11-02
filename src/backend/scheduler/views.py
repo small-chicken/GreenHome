@@ -94,6 +94,7 @@ class CarbonIntensityView(APIView):
         except requests.RequestException as e:
             return Response({"error": "Failed to fetch carbon intensity data"}, status=500)
 
+
 class HistoricCarbonIntensity(APIView):
     permission_classes = [permissions.AllowAny]
 

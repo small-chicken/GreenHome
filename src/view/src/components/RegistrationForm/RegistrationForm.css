@@ -27,11 +27,13 @@
   letter-spacing: 0.2px;
 }
 
+.email-box,
 .input-box,
 .password-box {
   margin-bottom: 1rem;
 }
 
+.email-box input,
 .input-box input,
 .password-box input {
   align-items: center;
@@ -49,12 +51,13 @@
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
+.email-box input:focus-visible,
 .input-box input::placeholder,
 .password-box input::placeholder {
   color: var(--text-muted);
 }
 
-
+.email-box input:focus-visible,
 .input-box input:focus-visible,
 .password-box input:focus-visible {
   outline: none;
