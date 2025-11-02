@@ -1,4 +1,7 @@
 .event-setter {
+  display: grid;
+  grid-auto-flow: row;
+  gap: 0.9rem;
   position: fixed;                 /* take it out of the flow and center */
   top: 50%;
   left: 50%;
@@ -18,7 +21,7 @@
 
 .event-dropdown {
   position: relative;
-  display: inline-block;
+  display: block;
 }
 
 /* Trigger button (keep if you already have one) */
@@ -103,7 +106,7 @@
 
 /* Checkbox row under the dropdown */
 .timepref {
-  display: inline-flex;           /* sit with content width */
+  display:flex;           /* sit with content width */
   align-items: center;
   gap: 0.7rem;                    /* space between box and text */
   margin-top: 0.75rem;            /* separation from menu */
@@ -192,30 +195,39 @@
   min-width: 0;
 }
 
-button[type="submit"] {
-  width: 25%;
+.event-submit {
+  margin-top: 0.25rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
+
   background: var(--primary);
   color: #fff;
   border: 1px solid var(--primary);
   border-radius: 0.75rem;
   padding: 0.5rem 0.8rem;
-  font-size: 0.9rem;
-  font-weight: 400;
+
+  font: 600 0.95rem/1.2 var(--cc-font-family);
   cursor: pointer;
-  font-family: var(--cc-font-family);
   transition: background-color 140ms ease, border-color 140ms ease, transform 60ms ease;
 }
 
-button[type="submit"]:hover {
+.event-submit:hover:not(:disabled) {
   background: var(--primary-hover);
   border-color: var(--primary-hover);
 }
 
-button[type="submit"]:active {
+.event-submit:active:not(:disabled) {
   transform: translateY(1px);
 }
 
+.event-submit:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+}
+
+.event-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

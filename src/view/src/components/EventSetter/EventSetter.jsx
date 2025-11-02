@@ -2,12 +2,13 @@ import React from "react";
 import './EventSetter.css';
 
 function EventSetter() {
-    const appliances = [{name: "Washing Machine", id: 0},
-                    {name: "Dishwasher", id: 1},
-                    {name: "Dryer", id: 2},
-                    {name: "Electric Vehicle", id: 3},
-                    {name: "Heating System", id: 4},
-                    {name: "Kitchen Appliances", id: 5},
+    const appliances = [
+      {name: "Washing Machine", id: 0},
+      {name: "Dishwasher", id: 1},
+      {name: "Dryer", id: 2},
+      {name: "Electric Vehicle", id: 3},
+      {name: "Heating System", id: 4},
+      {name: "Kitchen Appliances", id: 5},
     ]
 
   const buildSlots = (start = "00:00", end = "23:30", stepMin = 30) => {
@@ -28,8 +29,6 @@ function EventSetter() {
   return slots;
 };
 
-
-
   const dayOptions = [
   { label: "Today",    value: "today" },
   { label: "Tomorrow", value: "tomorrow" },
@@ -45,14 +44,21 @@ function EventSetter() {
    const [endTime, setEndTime] = React.useState("");     
    const [startDay, setStartDay] = React.useState(dayOptions[0].value);
    const [endDay, setEndDay] = React.useState(dayOptions[0].value); 
+   const [appliance, setAppliance] = React.useState(null);
    const ref = React.useRef(null);
 
    React.useEffect(() => {
     const onDocClick = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target)){
+        setOpen(false);
+        setTimeout(() => document.activeElement?.blur(), 0);
+      }
     };
     const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape"){
+        setOpen(false);
+        setTimeout(() => document.activeElement?.blur(), 0);
+      }
     };
     document.addEventListener("mousedown", onDocClick);
     document.addEventListener("keydown", onKey);
@@ -62,50 +68,41 @@ function EventSetter() {
     };
     }, []);
 
+  const timePrefValid = timePref ? startTime && endTime : true;
+  const canSubmit = !!appliance && timePrefValid;
+  const btnLabel = timePref
+    ? startTime && endTime
+      ? "Add event with time preferences"
+      : "Select both times…"
+    : "Add event with no time preferences";
 
-    const onSubmit = async(e) => {
-        e.preventDefault();
-        setError("");
 
-        try {
-      const response = await fetch("http://127.0.0.1:8000/scheduler/login/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username:username.trim(), password }),
-      });
+  const handleSubmit = async () => {
+  if (!canSubmit) return;
 
-      if (!response.ok) {
-      // DRF sends errors like { non_field_errors: ["Invalid credentials"] }
-      const backendError =
-        data.non_field_errors?.[0] ||
-        data.detail ||
-        data.error ||
-        "Login failed";
-      throw new Error(backendError);
-    }
-
-      const data = await response.json();
-      console.log("✅ Logged in:", data);
-
-      // Store tokens locally
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
-
-      // Save user in context
-      setUser({
-        username: data.user.username,
-        email: data.user.email,
-        access: data.access,
-      });
-
-      // Redirect to schedule
-      navigate("/schedule");
-    } catch (err) {
-      console.error("Error:", err);
-      setError(err.message || "Something went wrong");
-    }
+  let payload = {
+    appliance: appliance ? { id: appliance.id, name: appliance.name } : null,
   };
 
+  if (timePref) {
+    payload = {
+      ...payload,
+      timePreferences: {
+        start: {
+          dayToken: startDay,
+          time: startTime,                 // "HH:MM"
+        },
+        end: {
+          dayToken: endDay,
+          time: endTime,
+        },
+      },
+    };
+  } else {
+    payload = { ...payload, timePreferences: null };
+  }
+  console.log("Submitting event →", payload);
+};
 
     return (
     <div className="event-setter">
@@ -122,7 +119,7 @@ function EventSetter() {
           onClick={(e) => {
             setOpen(prev => {
               const next = !prev;
-              if (!next) e.currentTarget.blur();   // close → remove focus ring
+              if (!next) e.currentTarget.blur(); 
               return next;
             });
           }}
@@ -138,6 +135,7 @@ function EventSetter() {
               role="menuitem"
               className="event-dropdown__item"
               onClick={() => {
+                setAppliance(a);
                 setLabel(a.name);
                 setOpen(false);
                 setShowTimeOption(true);
@@ -214,8 +212,15 @@ function EventSetter() {
           </div>
           
         </div>
-      )} 
-        <button type="submit">Add event</button>
+      )}
+        <button
+          type="button"
+          className="event-submit"
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+        >
+          {btnLabel}
+        </button>
     </div>
   );
 }
