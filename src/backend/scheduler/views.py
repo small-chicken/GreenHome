@@ -131,7 +131,7 @@ def T(days=0, hours=0, minutes=0):
 
 
 class ScheduleEventsView(APIView):
-    permission_classes = [permissions.AllowAny]  # 👈 important
+    permission_classes = [permissions.AllowAny] 
 
     def post(self, request, *args, **kwargs):
         appliances_data = request.data.get('appliances')
