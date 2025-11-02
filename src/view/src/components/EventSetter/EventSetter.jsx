@@ -116,34 +116,48 @@ function EventSetter() {
   const handleSubmit = async () => {
   if (!canSubmit || !appliance) return;
 
-  let earliestISO, latestISO;
-
-  if (!timePref) {
-    // no time prefs → start = now rounded to slot, end = tomorrow 23:30
-    const nowSlot = roundUpToSlotHHMM(new Date(), 30);
-    const startDayToken =
-      nowSlot === "00:00" ? "tomorrow" : "today"; // if rounding crossed midnight
-    earliestISO = TfromISO(startDayToken, nowSlot);
-    latestISO   = TfromISO("tomorrow", END_OF_DAY);
-  } else {
-    // user provided some/all bounds
-    const effectiveStartDay = startDay;
-    const effectiveEndDay   = hasLatest ? endDay : startDay;
-    const effectiveStartHH  = hasEarliest ? startTime : START_OF_DAY;
-    const effectiveEndHH    = hasLatest   ? endTime   : END_OF_DAY;
-
-    earliestISO = TfromISO(effectiveStartDay, effectiveStartHH);
-    latestISO   = TfromISO(effectiveEndDay,   effectiveEndHH);
-  }
-
-  const payload = {
+  const base = {
     name: appliance.name,
     runtime_min: appliance.runtime_min,
-    earliest_start: earliestISO,
-    latest_end: latestISO,
   };
 
+  const payload = timePref
+    ? {
+        ...base,
+        earliest_start: hasEarliest ? TfromISO(startDay, startTime) : null,
+        latest_end: hasLatest ? TfromISO(endDay, endTime) : null,
+      }
+    : {
+        ...base,
+        earliest_start: null,
+        latest_end: null,
+      };
+
   console.log("Submitting event →", payload);
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/scheduler/schedule/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // optional — include JWT if authentication is enabled again
+        // "Authorization": `Bearer ${localStorage.getItem("access")}`,
+      },
+      body: JSON.stringify({ appliances: [payload] }), // Django expects a list
+    });
+
+    const data = await response.json();
+    console.log("✅ Scheduler response:", data);
+
+    if (!response.ok) {
+      alert(`❌ Error: ${data.error || data.detail || "Unknown error"}`);
+    } else {
+      alert("✅ Event scheduled successfully!");
+    }
+  } catch (err) {
+    console.error("Request failed:", err);
+    alert("⚠️ Failed to contact scheduler backend");
+  }
 };
 
 

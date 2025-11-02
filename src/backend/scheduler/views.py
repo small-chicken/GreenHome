@@ -10,6 +10,11 @@ from rest_framework.response import Response
 from rest_framework import status,generics, permissions
 from datetime import datetime, timezone, timedelta
 import requests
+import json
+from django.contrib.auth.models import User
+
+from .models import Appliance, EventInstance
+from .scheduler_alg import scheduler
 
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 #  Login + Register Views
@@ -110,3 +115,82 @@ class HistoricCarbonIntensity(APIView):
             return 
         except requests.RequestException as e:
             return Response({"error": "Failed to fetch carbon intensity data"}, status=500)
+        
+class ScheduleEventsView(APIView):
+    permission_classes = [permissions.AllowAny]  # temporarily disabled auth
+
+    def post(self, request):
+        try:
+            appliances = request.data.get("appliances", [])
+            if not appliances:
+                return Response({"error": "No appliances provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+            # --- Try to get 48-hour carbon intensity forecast from the API ---
+            forecast_url = "https://api.carbonintensity.org.uk/intensity/fw48h"
+            carbon_forecast = []
+            forecast_start_time = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
+
+            try:
+                resp = requests.get(forecast_url, timeout=10)
+                resp.raise_for_status()
+                forecast_data = resp.json().get("data", [])
+
+                if forecast_data:
+                    carbon_forecast = [period["intensity"]["forecast"] for period in forecast_data]
+                    forecast_start_time = datetime.fromisoformat(
+                        forecast_data[0]["from"].replace("Z", "+00:00")
+                    )
+                    print(f"✅ Successfully fetched {len(carbon_forecast)} forecast slots.")
+                else:
+                    raise ValueError("Empty forecast data")
+
+            except Exception as e:
+                # --- Fallback dummy pattern if the API fails ---
+                print(f"⚠️ Carbon API failed ({e}), using fallback forecast data instead.")
+
+                peak_cost = 100
+                mid_cost = 50
+                low_cost = 20
+
+                day_pattern = (
+                    [low_cost] * 12 +       # 00:00 - 05:45 (Overnight low)
+                    [peak_cost] * 6 +       # 06:00 - 08:45 (Morning peak)
+                    [mid_cost] * 8 +        # 09:00 - 12:45 (Daytime)
+                    [low_cost] * 8 +        # 13:00 - 16:45 (Solar peak / Midday low)
+                    [peak_cost] * 10 +      # 17:00 - 21:45 (Evening peak)
+                    [mid_cost] * 4          # 22:00 - 23:45 (Dropping off)
+                )
+                carbon_forecast = day_pattern * 2  # 48 hours = 96 half-hour slots
+                forecast_start_time = datetime.now(timezone.utc).replace(minute=0, second=0, microsecond=0)
+
+            # --- Sanity check ---
+            if len(carbon_forecast) != 96:
+                return Response({"error": f"Invalid forecast length ({len(carbon_forecast)})"}, status=500)
+
+            # --- Run the scheduler ---
+            optimal_schedule = scheduler(appliances, carbon_forecast, forecast_start_time)
+
+            saved_events = []
+            for app in appliances:
+                name = app["name"]
+                best_start = optimal_schedule.get(name)
+                if not best_start:
+                    continue
+
+                start_time = datetime.fromisoformat(best_start)
+                end_time = start_time + timedelta(minutes=app["runtime_min"])
+
+                saved_events.append({
+                    "appliance": name,
+                    "start_time": start_time.isoformat(),
+                    "end_time": end_time.isoformat()
+                })
+
+            return Response({
+                "message": "✅ Events scheduled successfully",
+                "schedule": saved_events
+            }, status=200)
+
+        except Exception as e:
+            print("Scheduler error:", e)
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -54,3 +54,5 @@ class GreenHourPrediction(models.Model):
 
     class Meta:
         verbose_name_plural = "Green Hour Predictions"
+
+__all__ = ["scheduler"]
