@@ -7,13 +7,14 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status,generics, permissions
+from rest_framework import status, generics, permissions
 from datetime import datetime, timezone, timedelta
 import requests
 import json
 from django.contrib.auth.models import User
 
 from .models import Appliance, EventInstance
+from .serializers import EventInstanceSerializer
 from .scheduler_alg import scheduler
 
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
@@ -194,3 +195,23 @@ class ScheduleEventsView(APIView):
         except Exception as e:
             print("Scheduler error:", e)
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class UserEventsView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self,request):
+        username = request.query_params.get("username")
+
+        if not username:
+            return Response({"error": "Username not provided"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({"error": f"User '{username}' not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+        events = EventInstance.objects.filter(user_id=user).order_by("start_time")
+
+        serializer = EventInstanceSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

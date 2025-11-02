@@ -86,7 +86,7 @@ function RegistrationForm() {
                 <button type="submit">Register</button>
 
                 <div className="login-link">
-                    <p>Don't have an account?</p>
+                    <p>Already have an account?</p>
                     <button onClick={() => navigate('/Login')}>Login</button>
                 </div>
            </form>
