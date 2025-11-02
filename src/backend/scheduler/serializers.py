@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from .models import EventInstance
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,3 +45,11 @@ class LoginSerializer(serializers.Serializer):
 
         data['user'] = user
         return data
+    
+class EventInstanceSerializer(serializers.ModelSerializer):
+    appliance_name = serializers.CharField(source="appliance_id.apliance_name", read_only=True)
+    username = serializers.CharField(source="user_id.username", read_only=True)
+
+    class Meta:
+        model = EventInstance
+        fields = ["event_instance_id", "username", "appliance_name", "start_time", "end_time", "green_score", "status"]

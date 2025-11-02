@@ -1,51 +1,13 @@
+/* DayViewContainer.css */
 .dayview-container {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 100vh;
-  padding: 20px;                 
+  align-items: stretch;          
+  justify-content: center;       
+  gap: 16px;                    
+  height: 100vh;                 
+  padding: 16px;                 
   box-sizing: border-box;
+  max-width: 1200px;             
+  margin: 0 auto;                
 }
 
-.dayview {
-  width: 48%;
-  height: 90%;
-  border: 1px solid #ddd;
-  padding: 16px;               
-  box-sizing: border-box;
-  font-family: var(--cc-font-family);
-
-  display: flex;
-  flex-direction: column;
-  gap: 8px;                      
-}
-
-.dayview__header {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.dayview__title {
-  font-size: 0.95rem;            
-  line-height: 1.25;
-  margin: 0;
-  font-weight: 700;
-}
-
-.dayview__date {
-  font-size: 0.85rem;            
-  color: var(--text-muted, #666);
-}
-
-.dayview__events {
-  flex: 1;                       
-  overflow: auto;                
-  padding-right: 4px;          
-}
-
-.dayview__events .event {
-  padding: 8px 10px;
-  border-bottom: 1px solid #eee;
-  font-size: 0.95rem;            
-}
