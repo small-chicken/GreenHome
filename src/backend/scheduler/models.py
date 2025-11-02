@@ -30,7 +30,7 @@ class ApplianceProperty(models.Model):
 
 class EventInstance(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    appliance = models.ForeignKey(Appliance, on_delete=models.CASCADE)
+    appliance = models.CharField(max_length=100)
     start_time = models.DateTimeField()
 
 
