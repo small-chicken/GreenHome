@@ -1,4 +1,7 @@
 src/backend/venv
+src/backend/__pycache__/
+src/backend/models
+*.joblib
 
 # Logs
 

@@ -42,17 +42,16 @@ class EventInstance(models.Model):
     class Meta:
         verbose_name_plural = "Event Instances"
 
-class GreenHourPrediction(models.Model):
-    timestamp = models.DateTimeField(auto_now_add=True)
-    predicted_start = models.DateTimeField()
-    predicted_end = models.DateTimeField()
-    renewable_percentage = models.FloatField()
-    confidence = models.FloatField(null=True, blank=True)
+class CarbonPredictions(models.Model):
+    timestamp = models.DateTimeField()
+    carbon_intensity = models.FloatField()  # e.g., grams of CO2 per kWh
 
     def __str__(self):
-        return f"Prediction {self.timestamp} ({self.renewable_percentage:.1f}%)"
+        return f"Carbon Intensity at {self.timestamp}: {self.carbon_intensity} gCO2/kWh"
 
     class Meta:
-        verbose_name_plural = "Green Hour Predictions"
+        verbose_name_plural = "Carbon Predictions"
+
+
 
 __all__ = ["scheduler"]
