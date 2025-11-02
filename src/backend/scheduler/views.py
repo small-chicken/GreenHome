@@ -130,105 +130,65 @@ def T(days=0, hours=0, minutes=0):
     return dt.isoformat()
 
 
-class ScheduleTaskView(APIView):
-    """
-    API view to schedule a single task or a list of tasks.
-    Receives task details via POST and returns the optimal start time(s).
-    """
-    permission_classes = [permissions.AllowAny] # Or AllowAny for testing
-    serializer_class = EventInstanceSerializer
+class ScheduleEventsView(APIView):
+    permission_classes = [permissions.AllowAny]  # 👈 important
 
     def post(self, request, *args, **kwargs):
-        
-        # --- 1. GET DATA FROM THE *NESTED* JSON PAYLOAD ---
-        
-        # Get the list of appliances from the "appliances" key
         appliances_data = request.data.get('appliances')
-
-        if not isinstance(appliances_data, list):
+        if not isinstance(appliances_data, list) or not appliances_data:
             return Response(
-                {"error": "Invalid payload. Expected a JSON object with an 'appliances' list."},
+                {"error": "Expected a list of appliances."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # This will hold the tasks in the format our scheduler function needs
-        appliances_list = []
-        
+        # Load your forecast data (same as before)
+        from .models import CarbonPredictions, Appliance, EventInstance
+        from .scheduler_utils import scheduler
+        from datetime import datetime, timedelta, timezone
+
         try:
-            # Loop through each appliance in the list (even if it's just one)
-            for task in appliances_data:
-
-                appliance_from_form = {
-                    # FIX 1: Look for 'name', not 'appliance_type'
-                    'name': task.get('name', 'user_task'), 
-                    # FIX 2: Get data from the 'task' dictionary
-                    'runtime_min': int(task.get('runtime_min')), 
-                    'earliest_start': task.get('earliest_start'),
-                    'latest_end': task.get('latest_end')
-                }
-                appliances_list.append(appliance_from_form)
-            
-        except (TypeError, ValueError, KeyError) as e:
-            return Response(
-                {"error": f"Invalid form data in appliance list: {e}. Check for missing fields or correct types."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        # 2. Query the Database for the Latest Forecast (This part is correct)
-        try:
-            current_forecast_qs = CarbonPredictions.objects.order_by('timestamp')
-
-            if not current_forecast_qs.exists():
-                raise CarbonPredictions.DoesNotExist
-                
-            carbon_forecast_list = [f.carbon_intensity for f in current_forecast_qs]
-            forecast_start_dt = current_forecast_qs.first().timestamp
-
-        except CarbonPredictions.DoesNotExist:
-            return Response(
-                {"error": "Carbon forecast is not available. Please try again in a few minutes."},
-                status=status.HTTP_503_SERVICE_UNAVAILABLE
-            )
+            forecast_qs = CarbonPredictions.objects.order_by("timestamp")
+            if not forecast_qs.exists():
+                return Response({"error": "No carbon forecast available."}, status=503)
+            forecast_start = forecast_qs.first().timestamp
+            carbon_forecast = [f.carbon_intensity for f in forecast_qs]
         except Exception as e:
-            return Response(
-                {"error": f"Error loading forecast data: {e}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({"error": str(e)}, status=500)
 
-        schedule_result = scheduler(
-            appliances_list, 
-            carbon_forecast_list, 
-            forecast_start_dt
-        )
-        saved_events = []
-        errors = []
+        # Prepare appliances list
+        formatted = []
+        for a in appliances_data:
+            formatted.append({
+                "name": a.get("name", "Unnamed task"),
+                "runtime_min": int(a.get("runtime_min", 0)),
+                "earliest_start": a.get("earliest_start"),
+                "latest_end": a.get("latest_end"),
+            })
 
-        for appliance_name, start_time in schedule_result.items():
-            
-            if start_time is None:
+        # Run scheduler
+        result = scheduler(formatted, carbon_forecast, forecast_start)
+
+        # Save results
+        created = []
+        for app in formatted:
+            start_iso = result.get(app["name"])
+            if not start_iso:
                 continue
-            
-            event_data = {
-                'appliance_name': appliance_name,  
-                'start_time': start_time,
-            }
-            
-            serializer = self.serializer_class(data=event_data)
-            if serializer.is_valid():
-                serializer.save(user=request.user) 
-                saved_events.append(serializer.data)
-            else:
-                errors.append({appliance_name: serializer.errors})
+            start_time = datetime.fromisoformat(start_iso.replace("Z", "+00:00"))
+            end_time = start_time + timedelta(minutes=app["runtime_min"])
 
-        if errors:
-            return Response(
-                {"error": "Could not save one or more events.", "details": errors}, 
-                status=status.HTTP_400_BAD_REQUEST
+            appliance_obj, _ = Appliance.objects.get_or_create(name=app["name"])
+            evt = EventInstance.objects.create(
+                appliance=appliance_obj,
+                start_time=start_time,
+                end_time=end_time,
             )
+            created.append(evt)
 
-        
-        return Response(schedule_result, status=status.HTTP_200_OK)
-        
+        from .serializers import EventInstanceSerializer
+        serializer = EventInstanceSerializer(created, many=True)
+        return Response(serializer.data, status=201)
+
 
 class UserEventsView(APIView):
     permission_classes = [permissions.AllowAny]
